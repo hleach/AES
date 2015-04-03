@@ -120,6 +120,7 @@ namespace MyAES {
 			}
 			return b1;
 		}
+
 		// Key schedule core (http://en.wikipedia.org/wiki/Rijndael_key_schedule)
 		// This operation is used as an inner loop in the key schedule, and is done in the following manner:
 		// The input is a 32-bit word and at an iteration number i. The output is a 32-bit word.
@@ -136,7 +137,7 @@ namespace MyAES {
 		}
 
 		// Expand key to a subkey for each round of en(de)cryption
-		internal static uint[] ExpandKey(byte[] key, int keysize = 0) {
+		private static uint[] ExpandKey(byte[] key, int keysize = 0) {
 			if (keysize == 0)
 				keysize = key.Length * 8;
 			int numWords, count, init;
@@ -194,7 +195,7 @@ namespace MyAES {
 		//
 
 		// Xor bytes of b1 with b2, circling through b2 as many times as necessary
-		public static byte[] XorBytes(byte[] b1, byte[] b2) {
+		private static byte[] XorBytes(byte[] b1, byte[] b2) {
 			byte[] rb = new byte[b1.Length];
 			for (int i = 0; i < b1.Length; i++)
 				rb[i] = (byte) (b1[i] ^ b2[i % b2.Length]);
@@ -231,7 +232,7 @@ namespace MyAES {
 
 		// This will load from a flat array into the state array starting at the 
 		// block of 16 at "offset". 0 for the first block of 16, 1 for the second, 2 for the third, etc...
-		internal static byte[,] LoadState(byte[] buf, int offset = 0) {
+		private static byte[,] LoadState(byte[] buf, int offset = 0) {
 			byte[,] state = new byte[4, 4];
 			int c = 0;
 			for (int i = 0; i < 4; i++) 
@@ -243,7 +244,7 @@ namespace MyAES {
 		}
 
 		// Dump state to byte array.
-		internal static byte[] DumpState(byte[,] state) {
+		private static byte[] DumpState(byte[,] state) {
 			byte[] b = new byte[16];
 			int c = 0;
 			for (int i = 0; i < 4; i++)
@@ -375,7 +376,7 @@ namespace MyAES {
 		}
 
 		// Encrypt a block loaded into a state with expanded key.
-		internal static void EncryptBlock(byte[,] state, uint[] key, int keysize) {	
+		private static void EncryptBlock(byte[,] state, uint[] key, int keysize) {	
 			int rounds;
 			switch (keysize) {
 				case 128:
@@ -425,6 +426,10 @@ namespace MyAES {
 					MixColumns(state, Invert);
 			}
 		}
+
+		//
+		// --- Public Interface ---
+		//
 
 		public static byte[] Encrypt(byte[] buf, byte[] key, Mode mode = Mode.ECB, 
 			byte[] iv = null, Padding padding = Padding.PKCS7) {
@@ -510,8 +515,12 @@ namespace MyAES {
 			return b2;
 		}
 
+		//
+		// --- Padding ---
+		//
+
 		// Pads buffer with filler using various padding styles 
-		public static byte[] PadBuffer(byte[] buf, int padfrom, int padto, Padding padding = Padding.PKCS7) {
+		private static byte[] PadBuffer(byte[] buf, int padfrom, int padto, Padding padding = Padding.PKCS7) {
 			if ((padto < buf.Length) | ((padto - padfrom) > 255))
 				return buf;
 			byte[] b = new byte[padto];
@@ -533,12 +542,12 @@ namespace MyAES {
 		}
 
 		// Pad to one extra block of size blocksize
-		public static byte[] PadBuffer(byte[] buf, int blocksize, Padding padding = Padding.PKCS7) {
+		private static byte[] PadBuffer(byte[] buf, int blocksize, Padding padding = Padding.PKCS7) {
 			return PadBuffer(buf, buf.Length, ((buf.Length / blocksize) + 1) * blocksize, padding);
 		}
 
 		// Returns the number of bytes padding at the end of the buffer.
-		public static int GetPadCount(byte[] buf, Padding padding = Padding.PKCS7) {
+		private static int GetPadCount(byte[] buf, Padding padding = Padding.PKCS7) {
 			if (padding == Padding.NONE)
 				return 0;
 			int c = 0;
