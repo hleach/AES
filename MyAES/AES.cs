@@ -543,7 +543,7 @@ namespace MyAES {
 
 		// Pad to one extra block of size blocksize
 		private static byte[] PadBuffer(byte[] buf, int blocksize, Padding padding = Padding.PKCS7) {
-			return PadBuffer(buf, buf.Length, ((buf.Length / blocksize) + 1) * blocksize, padding);
+			return PadBuffer(buf, buf.Length, ((buf.Length / blocksize) + ((buf.Length % blocksize) > 0? 1: 0)) * blocksize, padding);
 		}
 
 		// Returns the number of bytes padding at the end of the buffer.
