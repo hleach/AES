@@ -546,7 +546,7 @@ namespace MyAES {
 		// no matter how many nulls are added, they will be stripped). 
 		// No extra block will be added on Padding.NONE, but the last block will still be zero filled.
 		public static byte[] PadBuffer(byte[] buf, int blocksize, Padding padding = Padding.PKCS7) {
-			int extraBlock = (buf.Length % blocksize) == 0 && padding != Padding.NONE ? 1 : 0;
+			int extraBlock = (buf.Length % blocksize) == 0 && padding == Padding.NONE ? 0 : 1;
 			return PadBuffer(buf, buf.Length, ((buf.Length / blocksize) + extraBlock) * blocksize, padding);
 		}
 
