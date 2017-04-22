@@ -1,4 +1,4 @@
-﻿//
+//
 // Copyright (c) 2014 Heath Leach
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -541,9 +541,13 @@ namespace MyAES {
 			return b;
 		}
 
-		// Pad to one extra block of size blocksize
-		private static byte[] PadBuffer(byte[] buf, int blocksize, Padding padding = Padding.PKCS7) {
-			return PadBuffer(buf, buf.Length, ((buf.Length / blocksize) + 1) * blocksize, padding);
+		// This pads to an extra block on length % blocksize = 0 for PKCS7 (this is necessary per the standard)
+		// and Zero Padding (this is implementation dependent and deliberate, but really doesn't matter as
+		// no matter how many nulls are added, they will be stripped). 
+		// No extra block will be added on Padding.NONE, but the last block will still be zero filled.
+		public static byte[] PadBuffer(byte[] buf, int blocksize, Padding padding = Padding.PKCS7) {
+			int extraBlock = (buf.Length % blocksize) == 0 && padding != Padding.NONE ? 1 : 0;
+			return PadBuffer(buf, buf.Length, ((buf.Length / blocksize) + extraBlock) * blocksize, padding);
 		}
 
 		// Returns the number of bytes padding at the end of the buffer.
